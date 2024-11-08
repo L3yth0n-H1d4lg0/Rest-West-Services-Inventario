@@ -1,0 +1,41 @@
+package com.krakedev.inventarios.servicios;
+
+import java.util.ArrayList;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.krakedev.inventarios.bdd.ProductosBDD;
+import com.krakedev.inventarios.entidades.Producto;
+import com.krakedev.inventarios.excepciones.KrakeDevException;
+
+@Path("productos")
+public class ServiciosProductos {
+
+	@Path("saludar")
+	@GET
+	public String saludar() {
+		return "Hola mundo Rest Web Services Vegeta";
+	}
+
+	@Path("buscar/{sub}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response buscar(@PathParam("sub") String subcadena) {
+		ProductosBDD provBDD = new ProductosBDD();
+		ArrayList<Producto> productos;
+		System.out.println("Entrando a buscar");
+
+		try {
+			productos = provBDD.buscar(subcadena);
+			return Response.ok(productos).build();
+		} catch (KrakeDevException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al buscar productos").build();
+		}
+	}
+}
