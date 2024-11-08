@@ -2,7 +2,9 @@ package com.krakedev.inventarios.servicios;
 
 import java.util.ArrayList;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -26,16 +28,31 @@ public class ServiciosProductos {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response buscar(@PathParam("sub") String subcadena) {
-		ProductosBDD provBDD = new ProductosBDD();
+		ProductosBDD prodBDD = new ProductosBDD();
 		ArrayList<Producto> productos;
 		System.out.println("Entrando a buscar");
 
 		try {
-			productos = provBDD.buscar(subcadena);
+			productos = prodBDD.buscar(subcadena);
 			return Response.ok(productos).build();
 		} catch (KrakeDevException e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al buscar productos").build();
+		}
+	}
+
+	@Path("crear")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response crear(Producto producto) {
+		ProductosBDD prodBDD = new ProductosBDD();
+		try {
+			prodBDD.insertar(producto);
+			return Response.status(Response.Status.CREATED).entity("Producto creado exitosamente").build();
+		} catch (KrakeDevException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al crear producto").build();
 		}
 	}
 }
