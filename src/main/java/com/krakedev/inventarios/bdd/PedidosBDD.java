@@ -48,7 +48,7 @@ public class PedidosBDD {
 			for (int i = 0; i < detallesPedido.size(); i++) {
 				det = detallesPedido.get(i);
 				psDet = con.prepareStatement(
-						"insert into detalle_pedido(cabecera_pedido, producto, cantidad, subtotal, cantidad_requerida) "
+						"insert into detalle_pedido(cabecera_pedido, producto, cantidad_solicitada, subtotal, cantidad_recibida) "
 								+ "values(?,?,?,?,?)");
 				psDet.setInt(1, codigoCabecera);
 				psDet.setInt(2, det.getProducto().getCodigo());
@@ -65,6 +65,58 @@ public class PedidosBDD {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new KrakeDevException("Error al insertar el pedido. Detalle: " + e.getMessage());
+		} catch (KrakeDevException e) {
+			throw e;
+		} finally {
+			if (ps != null)
+				try {
+					ps.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public void actualizar(Pedido pedido) throws KrakeDevException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		PreparedStatement psDet = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement("update cabecera_pedido set estado = 'R' where numero = ?");
+			ps.setInt(1, pedido.getCodigo());
+
+			ps.executeUpdate();
+
+			ArrayList<DetallePedido> detallesPedido = pedido.getDetalles();
+
+			DetallePedido det;
+			for (int i = 0; i < detallesPedido.size(); i++) {
+				det = detallesPedido.get(i);
+				psDet = con.prepareStatement(
+						"update detalle_pedido set cantidad_recibida = ?, subtotal = ? where codigo = ?");
+				psDet.setInt(1, det.getCantidadRecibida());
+
+				BigDecimal precioVenta = det.getProducto().getPrecioVenta();
+				BigDecimal cantidadRecibida = new BigDecimal(det.getCantidadRecibida());
+				BigDecimal subtotal = precioVenta.multiply(cantidadRecibida);
+				psDet.setBigDecimal(2, subtotal);
+
+				psDet.setInt(3, det.getCodigo());
+
+				psDet.executeUpdate();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeDevException("Error al actualizar el pedido. Detalle: " + e.getMessage());
 		} catch (KrakeDevException e) {
 			throw e;
 		} finally {

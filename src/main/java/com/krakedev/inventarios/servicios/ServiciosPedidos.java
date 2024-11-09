@@ -3,6 +3,7 @@ package com.krakedev.inventarios.servicios;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -18,7 +19,7 @@ public class ServiciosPedidos {
 	@Path("saludar")
 	@GET
 	public String saludar() {
-		return "Hola mundo Rest Web Services";
+		return "Hola mundo Rest Web Services Prueba";
 	}
 
 	@Path("registrar")
@@ -36,4 +37,19 @@ public class ServiciosPedidos {
 					.build();
 		}
 	}
+
+	@Path("recibir")
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response actualizar(Pedido pedido) {
+		PedidosBDD pedidoBDD = new PedidosBDD();
+		try {
+			pedidoBDD.actualizar(pedido);
+			return Response.status(Response.Status.CREATED).entity("Pedido actualizado exitosamente").build();
+		} catch (KrakeDevException e) {
+			e.printStackTrace();
+			return Response.serverError().build();
+		}
+	}
+
 }
