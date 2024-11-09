@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -60,6 +61,7 @@ public class PedidosBDD {
 				psDet.setBigDecimal(5, subtotal);
 
 				psDet.executeUpdate();
+				psDet.close();
 			}
 
 		} catch (SQLException e) {
@@ -88,6 +90,10 @@ public class PedidosBDD {
 		Connection con = null;
 		PreparedStatement ps = null;
 		PreparedStatement psDet = null;
+		PreparedStatement psHis = null;
+
+		Date fechaActual = new Date();
+		Timestamp fechaHoraActual = new Timestamp(fechaActual.getTime());
 
 		try {
 			con = ConexionBDD.obtenerConexion();
@@ -113,7 +119,18 @@ public class PedidosBDD {
 				psDet.setInt(3, det.getCodigo());
 
 				psDet.executeUpdate();
+				psDet.close();
+
+				psHis = con.prepareStatement(
+						"insert into historial_stock(fecha, referencia, producto, cantidad) values(?, ?, ?, ?)");
+				psHis.setTimestamp(1, fechaHoraActual);
+				psHis.setString(2, "Pedido " + det.getCodigo());
+				psHis.setInt(3, det.getProducto().getCodigo());
+				psHis.setInt(4, det.getCantidadRecibida());
+				psHis.executeUpdate();
+				psHis.close();
 			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new KrakeDevException("Error al actualizar el pedido. Detalle: " + e.getMessage());
@@ -126,13 +143,12 @@ public class PedidosBDD {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
-			if (con != null) {
+			if (con != null)
 				try {
 					con.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
-			}
 		}
 	}
 }
