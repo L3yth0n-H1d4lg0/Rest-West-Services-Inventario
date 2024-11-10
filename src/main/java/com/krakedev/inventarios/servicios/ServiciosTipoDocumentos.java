@@ -15,6 +15,12 @@ import com.krakedev.inventarios.excepciones.KrakeDevException;
 @Path("tiposdocumento")
 public class ServiciosTipoDocumentos {
 
+	@Path("saludar")
+	@GET
+	public String saludar() {
+		return "Servicios Tipos de Documentos";
+	}
+
 	@Path("recuperar")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

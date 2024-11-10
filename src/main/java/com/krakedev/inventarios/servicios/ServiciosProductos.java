@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -21,7 +22,7 @@ public class ServiciosProductos {
 	@Path("saludar")
 	@GET
 	public String saludar() {
-		return "Hola mundo Rest Web Services";
+		return "Servicios Productos";
 	}
 
 	@Path("buscar/{sub}")
@@ -30,7 +31,6 @@ public class ServiciosProductos {
 	public Response buscar(@PathParam("sub") String subcadena) {
 		ProductosBDD prodBDD = new ProductosBDD();
 		ArrayList<Producto> productos;
-		System.out.println("Entrando a buscar");
 
 		try {
 			productos = prodBDD.buscar(subcadena);
@@ -55,4 +55,37 @@ public class ServiciosProductos {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al crear producto").build();
 		}
 	}
+
+	@Path("actualizar")
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response actualizar(Producto producto) {
+		ProductosBDD prodBDD = new ProductosBDD();
+		try {
+			prodBDD.actualizar(producto);
+			return Response.status(Response.Status.CREATED).entity("Producto actualizado exitosamente").build();
+		} catch (KrakeDevException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al actualizar producto")
+					.build();
+		}
+	}
+
+	@Path("buscarPorId/{id}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response buscarPorId(@PathParam("id") int codigo) {
+		ProductosBDD prodBDD = new ProductosBDD();
+		Producto producto;
+
+		try {
+			producto = prodBDD.buscarPorId(codigo);
+			return Response.ok(producto).build();
+		} catch (KrakeDevException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al buscar el producto").build();
+		}
+	}
+
 }

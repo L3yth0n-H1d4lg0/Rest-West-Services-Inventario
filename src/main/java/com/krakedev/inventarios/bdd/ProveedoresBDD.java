@@ -33,11 +33,12 @@ public class ProveedoresBDD {
 				String identificador = rs.getString("identificador");
 				String codigoTipoDocumento = rs.getString("tipo_documento");
 				String descripcionTipoDocumento = rs.getString("descripcion");
+				TipoDocumento td = new TipoDocumento(codigoTipoDocumento, descripcionTipoDocumento);
 				String nombre = rs.getString("nombre");
 				String telefono = rs.getString("telefono");
 				String correo = rs.getString("correo");
 				String direccion = rs.getString("direccion");
-				TipoDocumento td = new TipoDocumento(codigoTipoDocumento, descripcionTipoDocumento);
+
 				proveedor = new Proveedor(identificador, td, nombre, telefono, correo, direccion);
 				proveedores.add(proveedor);
 			}
@@ -111,4 +112,63 @@ public class ProveedoresBDD {
 			}
 		}
 	}
+
+	public Proveedor buscarPorId(String id) throws KrakeDevException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Proveedor proveedor = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement(
+					"select prov.identificador, prov.tipo_documento, td.descripcion, prov.nombre, prov.telefono, prov.correo, prov.direccion "
+							+ "from proveedores prov, tipo_documentos td "
+							+ "where prov.tipo_documento = td.codigo and identificador = ?");
+			ps.setString(1, id);
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				String identificador = rs.getString("identificador");
+				String codigoTipoDocumento = rs.getString("tipo_documento");
+				String descripcionTipoDocumento = rs.getString("descripcion");
+				TipoDocumento td = new TipoDocumento(codigoTipoDocumento, descripcionTipoDocumento);
+				String nombre = rs.getString("nombre");
+				String telefono = rs.getString("telefono");
+				String correo = rs.getString("correo");
+				String direccion = rs.getString("direccion");
+
+				proveedor = new Proveedor(identificador, td, nombre, telefono, correo, direccion);
+			}
+
+		} catch (KrakeDevException e) {
+			e.printStackTrace();
+			throw e;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeDevException("Error al consultar. Detalle: " + e.getMessage());
+		} finally {
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			if (ps != null)
+				try {
+					ps.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			if (con != null)
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+
+		return proveedor;
+	}
+
 }

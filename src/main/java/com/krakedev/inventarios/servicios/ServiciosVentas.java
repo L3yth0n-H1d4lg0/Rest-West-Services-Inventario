@@ -18,7 +18,7 @@ public class ServiciosVentas {
 	@Path("saludar")
 	@GET
 	public String saludar() {
-		return "Hola mundo Rest Web Services Venta";
+		return "Servicios Ventas";
 	}
 
 	@Path("guardar")

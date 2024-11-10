@@ -3,6 +3,9 @@ package com.krakedev.inventarios.entidades;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Pedido {
 	private int codigo;
 	private Proveedor proveedor;

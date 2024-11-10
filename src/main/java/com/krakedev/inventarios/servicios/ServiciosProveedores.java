@@ -20,7 +20,7 @@ public class ServiciosProveedores {
 	@Path("saludar")
 	@GET
 	public String saludar() {
-		return "Hola mundo Rest Web Services";
+		return "Servicios Proveedores";
 	}
 
 	@Path("buscar/{sub}")
@@ -53,5 +53,21 @@ public class ServiciosProveedores {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al crear proveedor").build();
 		}
 	}
-	
+
+	@Path("buscarPorId/{sub}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response buscarPorId(@PathParam("sub") String id) {
+		ProveedoresBDD provBDD = new ProveedoresBDD();
+		Proveedor proveedor;
+
+		try {
+			proveedor = provBDD.buscarPorId(id);
+			return Response.ok(proveedor).build();
+		} catch (KrakeDevException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al buscar proveedores").build();
+		}
+	}
+
 }

@@ -1,5 +1,8 @@
 package com.krakedev.inventarios.entidades;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL) // Omite los campos null durante la serialización
 public class Categoria {
 	private int codigo;
 	private String nombre;
@@ -7,6 +10,12 @@ public class Categoria {
 
 	public Categoria() {
 		super();
+	}
+
+	public Categoria(int codigo, String nombre) {
+		super();
+		this.codigo = codigo;
+		this.nombre = nombre;
 	}
 
 	public Categoria(int codigo, String nombre, Categoria categoriaPadre) {
